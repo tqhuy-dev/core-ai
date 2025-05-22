@@ -1,2 +1,2 @@
-from .calculate_flight_value import calculate_flight_value
+from .calculate_flight_value import calculate_flight_value, CommonTool
 from .calculate_distance import  calculate_distance_value

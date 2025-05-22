@@ -14,3 +14,14 @@ def calculate_flight_value(flight_location: str) -> int:
         return 3000
     else:
         return 500
+
+
+
+def CommonTool(map_flight: dict):
+    @tool("flight_value_tool", args_schema=CalculateFlightValue)
+    def calculate_flight_value_v2(flight_location: str) -> int:
+        if flight_location in map_flight:
+            return map_flight[flight_location]
+        else:
+            return 0
+    return calculate_flight_value_v2
