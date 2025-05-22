@@ -2,7 +2,7 @@ from core import LangFunctionTool
 
 
 class BaseResponseAgentDto:
-    def __init__(self, response: str,question: str, role: str, function_tools: LangFunctionTool | None):
+    def __init__(self, response: str,question: str, role: str, function_tools: list[LangFunctionTool]):
         self.response = response
         self.role = role
         self.function_tools = function_tools
@@ -12,6 +12,6 @@ class BaseResponseAgentDto:
         return {
             "response": self.response,
             "role": self.role,
-            "function_tools": self.function_tools.__dict__ if self.function_tools else None,
+            "function_tools": [{"name": t.function_name , "content": t.content} for t in self.function_tools] if self.function_tools else [],
             "question": self.question
         }

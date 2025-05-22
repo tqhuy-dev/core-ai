@@ -22,14 +22,24 @@ class AgentsOpenAIWithTools:
         content = ''
         response:BaseResponseAgentDto = BaseResponseAgentDto(question=input_text,
                                                              role='user', response=content,
-                                                             function_tools=None)
+                                                             function_tools=[])
+        response.function_tools = []
         for step in self.agent.stream({"messages": [HumanMessage(content=input_text)]},self.config,
                 stream_mode="values",
         ):
             if isinstance(step["messages"][-1] , ToolMessage):
                 tool_message_data = core.ToolMessageLangHandle(step["messages"][-1])
-                response.function_tools= tool_message_data.get_function_tools()
+                tool_data = tool_message_data.get_function_tools()
+                if len(response.function_tools) == 0:
+                    response.function_tools.append(tool_data)
+                else:
+                    for index , value in enumerate(response.function_tools):
+                        if response.function_tools[index].name == tool_data.function_name:
+                            response.function_tools[index] = tool_data
+                        else:
+                            response.function_tools.append(tool_data)
             content = step["messages"][-1].content
 
-        response.content = content
+        response.response = content
+        print(response)
         return response
