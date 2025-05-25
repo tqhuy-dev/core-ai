@@ -1,5 +1,49 @@
 import gradio as gr
 import os
+import pandas as pd
+from langchain_chroma import Chroma
+from langchain_core.documents import Document
+from langchain_core.tools import create_retriever_tool
+from langchain_openai import OpenAIEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+
+map_file_name = {}
+
+def load_into_pandas(file):
+    """
+    Load data from an Excel file into a pandas DataFrame.
+
+    Args:
+        file: Path to the Excel file
+
+    Returns:
+        pandas.DataFrame: DataFrame containing the Excel data
+    """
+    return pd.read_excel(file)
+
+def save_into_vector_store(df, file_name):
+    """
+    Save data from a pandas DataFrame into a vector store.
+    """
+    chunks = []
+    for idx, row in df.iterrows():
+        row_text = ", ".join([f"{col}: {row[col]}" for col in df.columns])
+        chunks.append(row_text)
+
+    docs = [Document(page_content=chunk) for chunk in chunks]
+    splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+    split_docs = splitter.split_documents(docs)
+    embeddings = OpenAIEmbeddings()
+    vs_name = f"vs_{file_name}"
+    if os.path.exists(vs_name):
+        Chroma(persist_directory=vs_name, embedding_function=embeddings).delete_collection()
+    vectorstore = Chroma.from_documents(documents=split_docs,
+                                        embedding=embeddings,
+                                        persist_directory=vs_name)
+    return vectorstore
+
+
 
 def process_file(file_obj):
     """
@@ -15,6 +59,14 @@ def process_file(file_obj):
     # Here you would typically process the file
     # For demonstration, we'll just return the file name
 
+    # Example of using the load_into_pandas function
+    df = load_into_pandas(file_obj.name)
+    vectorstore = save_into_vector_store(df, file_name)
+    retriever = vectorstore.as_retriever()
+    retriever_tool = create_retriever_tool(retriever, 
+                                           f"search_internal_documents_of_{file_name}",
+                                           f"Search internal documents of {file_name}")
+    map_file_name[file_name] = retriever_tool
     # Make the text input visible and hide the file input
     return f"File '{file_name}' uploaded successfully. Please enter your text:", gr.update(visible=True), gr.update(visible=False)
 
@@ -35,6 +87,7 @@ def reset_interface():
     """
     Reset the interface to its initial state.
     """
+    map_file_name.clear()
     return None, gr.update(value="", visible=False), gr.update(visible=True)
 
 # Create the Gradio interface
@@ -54,6 +107,7 @@ with gr.Blocks() as demo:
     # File input (initially visible)
     file_input = gr.File(
         label="Upload a file",
+        file_types=[".xlsx"]
     )
 
     # Submit buttons
