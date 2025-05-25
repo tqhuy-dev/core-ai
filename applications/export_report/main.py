@@ -7,8 +7,10 @@ from langchain_core.tools import create_retriever_tool
 from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+from applications.export_report.graph import init_graph_agent
 
 map_file_name = {}
+global graph_agent
 
 def load_into_pandas(file):
     """
@@ -64,9 +66,11 @@ def process_file(file_obj):
     vectorstore = save_into_vector_store(df, file_name)
     retriever = vectorstore.as_retriever()
     retriever_tool = create_retriever_tool(retriever, 
-                                           f"search_internal_documents_of_{file_name}",
-                                           f"Search internal documents of {file_name}")
+                                           f"search_internal_documents_of_data",
+                                           f"Search internal documents of data")
     map_file_name[file_name] = retriever_tool
+    global graph_agent
+    graph_agent = init_graph_agent(retriever_tool)
     # Make the text input visible and hide the file input
     return f"File '{file_name}' uploaded successfully. Please enter your text:", gr.update(visible=True), gr.update(visible=False)
 
@@ -80,7 +84,16 @@ def process_text(text):
 
     # Here you would typically process the text
     # For demonstration, we'll just return the text
-
+    global graph_agent
+    response = graph_agent.invoke({
+        "messages": [
+            {
+                "role": "user",
+                "content": f"{text}",
+            }
+        ]
+    })
+    text = response["messages"][-1].content
     return f"You entered: {text}"
 
 def reset_interface():
@@ -88,6 +101,8 @@ def reset_interface():
     Reset the interface to its initial state.
     """
     map_file_name.clear()
+    global graph_agent
+    graph_agent = None
     return None, gr.update(value="", visible=False), gr.update(visible=True)
 
 # Create the Gradio interface
