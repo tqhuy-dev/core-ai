@@ -1,6 +1,7 @@
 import gradio as gr
 import os
 import pandas as pd
+from datetime import datetime
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_core.tools import create_retriever_tool
@@ -62,17 +63,17 @@ def process_file(file_obj):
     # For demonstration, we'll just return the file name
 
     # Example of using the load_into_pandas function
-    df = load_into_pandas(file_obj.name)
-    vectorstore = save_into_vector_store(df, file_name)
-    retriever = vectorstore.as_retriever()
-    retriever_tool = create_retriever_tool(retriever, 
-                                           f"search_internal_documents_of_data",
-                                           f"Search internal documents of data")
-    map_file_name[file_name] = retriever_tool
-    global graph_agent
-    graph_agent = init_graph_agent(retriever_tool)
+    # df = load_into_pandas(file_obj.name)
+    # vectorstore = save_into_vector_store(df, file_name)
+    # retriever = vectorstore.as_retriever()
+    # retriever_tool = create_retriever_tool(retriever,
+    #                                        f"search_internal_documents_of_data",
+    #                                        f"Search internal documents of data")
+    # map_file_name[file_name] = retriever_tool
+    # global graph_agent
+    # graph_agent = init_graph_agent(retriever_tool)
     # Make the text input visible and hide the file input
-    return f"File '{file_name}' uploaded successfully. Please enter your text:", gr.update(visible=True), gr.update(visible=False)
+    return f"## File Uploaded\n\nFile '**{file_name}**' uploaded successfully. Please enter your text:", gr.update(visible=True), gr.update(visible=False)
 
 def process_text(text):
     """
@@ -84,17 +85,46 @@ def process_text(text):
 
     # Here you would typically process the text
     # For demonstration, we'll just return the text
-    global graph_agent
-    response = graph_agent.invoke({
-        "messages": [
-            {
-                "role": "user",
-                "content": f"{text}",
-            }
-        ]
-    })
-    text = response["messages"][-1].content
-    return f"You entered: {text}"
+    # global graph_agent
+    # response = graph_agent.invoke({
+    #     "messages": [
+    #         {
+    #             "role": "user",
+    #             "content": f"{text}",
+    #         }
+    #     ]
+    # })
+    # text = response["messages"][-1].content
+
+    # Return text in Markdown format
+    return f"## Response\n\nYou entered: **{text}**"
+
+def export_to_md(text):
+    """
+    Export the output text to a Markdown file and return it for download.
+
+    Args:
+        text: The text to export
+
+    Returns:
+        tuple: A message indicating the result of the export and the file path for download
+    """
+    if not text:
+        return "No content to export.", None
+
+    # Create a timestamped filename
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"export_{timestamp}.md"
+
+    # Ensure the exports directory exists
+    os.makedirs("exports", exist_ok=True)
+    filepath = os.path.join("exports", filename)
+
+    # Write the content to the file
+    with open(filepath, "w") as f:
+        f.write(text)
+
+    return f"## Export Successful\n\nContent exported to **{filename}**", filepath
 
 def reset_interface():
     """
@@ -103,33 +133,43 @@ def reset_interface():
     map_file_name.clear()
     global graph_agent
     graph_agent = None
-    return None, gr.update(value="", visible=False), gr.update(visible=True)
+    return "## Interface Reset\n\nPlease upload a new file.", gr.update(value="", visible=False), gr.update(visible=True)
 
 # Create the Gradio interface
 with gr.Blocks() as demo:
     gr.Markdown("# Dynamic Form Application")
 
-    # Output area for messages
-    output_message = gr.Markdown()
-
-    # Text input (initially hidden)
-    text_input = gr.Textbox(
-        label="Enter your text",
-        placeholder="Type here...",
-        visible=False
-    )
-
-    # File input (initially visible)
-    file_input = gr.File(
-        label="Upload a file",
-        file_types=[".xlsx"]
-    )
-
-    # Submit buttons
     with gr.Row():
-        file_submit = gr.Button("Submit File")
-        text_submit = gr.Button("Submit Text", visible=False)
-        reset_button = gr.Button("Reset")
+        # Left column for inputs
+        with gr.Column():
+            # File input (initially visible)
+            file_input = gr.File(
+                label="Upload a file",
+                file_types=[".xlsx"]
+            )
+
+            # Text input (initially hidden)
+            text_input = gr.Textbox(
+                label="Enter your text",
+                placeholder="Type here...",
+                visible=False
+            )
+
+            # Submit buttons
+            with gr.Row():
+                file_submit = gr.Button("Submit File")
+                text_submit = gr.Button("Submit Text", visible=False)
+                reset_button = gr.Button("Reset")
+
+        # Right column for outputs
+        with gr.Column():
+            # Output area for messages
+            output_message = gr.Markdown()
+
+            # Export button and download file
+            with gr.Row():
+                export_button = gr.Button("Export to MD", visible=True)
+                download_file = gr.File(label="Download", visible=False)
 
     # Set up event handlers
     file_submit.click(
@@ -151,8 +191,19 @@ with gr.Blocks() as demo:
         fn=reset_interface,
         outputs=[output_message, text_input, file_input]
     ).then(
-        fn=lambda: [gr.update(visible=False), gr.update(visible=True)],
-        outputs=[text_submit, file_submit]
+        fn=lambda: [gr.update(visible=False), gr.update(visible=True), gr.update(visible=False)],
+        outputs=[text_submit, file_submit, download_file]
+    )
+
+    # Export button event handler
+    export_button.click(
+        fn=export_to_md,
+        inputs=[output_message],
+        outputs=[output_message, download_file]
+    ).then(
+        fn=lambda file_path: gr.update(visible=file_path is not None),
+        inputs=[download_file],
+        outputs=[download_file]
     )
 
 # Launch the app
