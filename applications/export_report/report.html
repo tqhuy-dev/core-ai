@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Summarize and Analyst Data of Canada</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3a0ca3;
+      --text-color: #2b2d42;
+      --light-bg: #f8f9fa;
+      --border-color: #e9ecef;
+      --success-color: #2a9d8f;
+      --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--light-bg);
+      color: var(--text-color);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 20px 0;
+      text-align: center;
+      margin-bottom: 30px;
+      box-shadow: var(--card-shadow);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2.5rem;
+    }
+
+    .subtitle {
+      font-weight: 300;
+      margin-top: 10px;
+    }
+
+
+    .file-selector h2 {
+      margin-top: 0;
+      color: var(--secondary-color);
+    }
+
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+      gap: 20px;
+    }
+
+
+    .title {
+      font-weight: 500;
+      font-size: 1.2rem;
+      margin: 0;
+    }
+
+    .item-body {
+      padding: 20px;
+    }
+
+    .value {
+      color: var(--success-color);
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .chart-container {
+      height: 250px;
+      margin-bottom: 15px;
+    }
+
+    .conclusion {
+      background-color: var(--light-bg);
+      padding: 15px;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .conclusion-title {
+      font-weight: 500;
+      margin-bottom: 5px;
+      color: var(--secondary-color);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 50px;
+      font-size: 1.2rem;
+      color: var(--secondary-color);
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      padding: 20px;
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Summarize and Analyst Data of Canada</h1>
+    <div class="subtitle">Interactive visualization of analytical insights</div>
+  </header>
+
+  <div class="container">
+    <div id="loading" class="loading" style="display: none;">
+      Loading data and generating visualizations...
+    </div>
+
+    <div id="analysis-container" class="grid"></div>
+  </div>
+
+  <footer>
+    &copy; 2025 Data Analysis Tool
+  </footer>
+
+  <script>
+    const jsonData =
+{
+  "data_analysis": [
+    {
+      "description": "Minimum life expectancy recorded in Canada from the dataset.",
+      "value": 72.13,
+      "visual": "bar_chart",
+      "conclusion": "The minimum life expectancy in Canada was 72.13 years in 1967, indicating a baseline for health standards during that period."
+    },
+    {
+      "description": "Maximum life expectancy recorded in Canada from the dataset.",
+      "value": 80.653,
+      "visual": "bar_chart",
+      "conclusion": "The maximum life expectancy reached 80.653 years in 2007, showing an improvement in health and longevity over the decades."
+    },
+    {
+      "description": "Average life expectancy in Canada over the years provided.",
+      "value": 76.215,
+      "visual": "line_chart",
+      "conclusion": "The average life expectancy across the years analyzed is 76.215 years, reflecting a general trend of increasing life expectancy."
+    },
+    {
+      "description": "Population growth in Canada from 1967 to 2007.",
+      "value": {
+        "1967": 20819767,
+        "1977": 23796400,
+        "1987": 26549700,
+        "2007": 33390141
+      },
+      "visual": "line_chart",
+      "conclusion": "The population of Canada has shown a consistent upward trend, growing from approximately 20.8 million in 1967 to over 33.3 million in 2007."
+    },
+    {
+      "description": "GDP per capita growth in Canada from 1967 to 2007.",
+      "value": {
+        "1967": 16076.58803,
+        "1977": 22090.88306,
+        "1987": 26626.51503,
+        "2007": 36319.23501
+      },
+      "visual": "line_chart",
+      "conclusion": "GDP per capita has significantly increased from approximately $16,076 in 1967 to over $36,319 in 2007, indicating economic growth and improved living standards."
+    },
+    {
+      "description": "Correlation between life expectancy and GDP per capita.",
+      "value": "Positive correlation observed",
+      "visual": "scatter_plot",
+      "conclusion": "There is a positive correlation between life expectancy and GDP per capita, suggesting that as the economy grows, the health and longevity of the population improve."
+    },
+    {
+      "description": "Population density changes over the years.",
+      "value": {
+        "1967": 0.67,
+        "1977": 0.71,
+        "1987": 0.77,
+        "2007": 0.91
+      },
+      "visual": "line_chart",
+      "conclusion": "Population density has increased over the years, indicating urbanization and possibly changes in migration patterns."
+    }
+  ]
+}
+
+    // Function to render a value that might be complex (object with year-value pairs)
+    function renderValue(value) {
+      if (typeof value === 'object' && value !== null) {
+        // For objects like year-value pairs
+        return Object.entries(value)
+          .map(([key, val]) => `${key}: ${typeof val === 'number' ? val.toLocaleString() : val}`)
+          .join('<br>');
+      } else if (typeof value === 'number') {
+        // Format numbers with commas
+        return value.toLocaleString();
+      } else {
+        return value;
+      }
+    }
+
+    // Function to create a chart based on the data and chart type
+    function createChart(canvasId, item) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+
+      let chart;
+      const value = item.value;
+
+      if (item.visual === 'bar_chart') {
+        if (typeof value === 'object' && value !== null) {
+          // For objects like year-value pairs
+          chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: Object.keys(value),
+              datasets: [{
+                label: item.description,
+                data: Object.values(value),
+                backgroundColor: 'rgba(67, 97, 238, 0.7)',
+                borderColor: 'rgba(67, 97, 238, 1)',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
+            }
+          });
+        } else {
+          // For single values
+          chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: ['Value'],
+              datasets: [{
+                label: item.description,
+                data: [value],
+                backgroundColor: 'rgba(67, 97, 238, 0.7)',
+                borderColor: 'rgba(67, 97, 238, 1)',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
+            }
+          });
+        }
+      } else if (item.visual === 'line_chart') {
+        if (typeof value === 'object' && value !== null) {
+          chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: Object.keys(value),
+              datasets: [{
+                label: item.description,
+                data: Object.values(value),
+                fill: false,
+                borderColor: 'rgba(58, 12, 163, 1)',
+                tension: 0.1
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false
+            }
+          });
+        } else {
+          // Fallback for single values
+          chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: ['Value'],
+              datasets: [{
+                label: item.description,
+                data: [value],
+                fill: false,
+                borderColor: 'rgba(58, 12, 163, 1)',
+                tension: 0.1
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false
+            }
+          });
+        }
+      } else if (item.visual === 'scatter_plot') {
+        // For scatter plots, we need x and y values
+        // Since we don't have paired data, we'll create a simple visualization
+        chart = new Chart(ctx, {
+          type: 'scatter',
+          data: {
+            datasets: [{
+              label: item.description,
+              data: [{ x: 0, y: 0 }], // Placeholder
+              backgroundColor: 'rgba(42, 157, 143, 0.7)'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false
+          }
+        });
+      } else {
+        // Default to a simple bar chart
+        chart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Value'],
+            datasets: [{
+              label: item.description,
+              data: [typeof value === 'number' ? value : 0],
+              backgroundColor: 'rgba(67, 97, 238, 0.7)',
+              borderColor: 'rgba(67, 97, 238, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      }
+
+      return chart;
+    }
+
+    // Function to render the analysis items
+    function renderAnalysis(data) {
+      const container = document.getElementById('analysis-container');
+      container.innerHTML = ''; // Clear previous content
+
+      if (!data || !data.data_analysis || !Array.isArray(data.data_analysis)) {
+        container.innerHTML = '<div class="loading">No valid data found. Please select a valid JSON file.</div>';
+        return;
+      }
+
+      data.data_analysis.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'item';
+
+        // Create item header with title
+        const header = document.createElement('div');
+        header.className = 'item-header';
+        header.innerHTML = `<h3 class="title">${item.description}</h3>`;
+        div.appendChild(header);
+
+        // Create item body
+        const body = document.createElement('div');
+        body.className = 'item-body';
+
+        // Add value
+        const valueDiv = document.createElement('div');
+        valueDiv.className = 'value';
+        valueDiv.innerHTML = renderValue(item.value);
+        body.appendChild(valueDiv);
+
+        // Add chart container and canvas
+        const chartContainer = document.createElement('div');
+        chartContainer.className = 'chart-container';
+        const canvas = document.createElement('canvas');
+        const canvasId = `chart-${index}`;
+        canvas.id = canvasId;
+        chartContainer.appendChild(canvas);
+        body.appendChild(chartContainer);
+
+        // Add conclusion
+        if (item.conclusion) {
+          const conclusionDiv = document.createElement('div');
+          conclusionDiv.className = 'conclusion';
+          conclusionDiv.innerHTML = `
+            <div class="conclusion-title">Conclusion:</div>
+            <div>${item.conclusion}</div>
+          `;
+          body.appendChild(conclusionDiv);
+        }
+
+        div.appendChild(body);
+        container.appendChild(div);
+
+        // Create chart after the canvas is in the DOM
+        createChart(canvasId, item);
+      });
+    }
+
+
+    // Function to get the most recent export file
+    function loadMostRecentExport() {
+      try {
+        const loading = document.getElementById('loading');
+        loading.style.display = 'block';
+        renderAnalysis(jsonData)
+      } catch (error) {
+        console.error('Error loading most recent export:', error);
+        document.getElementById('analysis-container').innerHTML = 
+          '<div class="loading">Could not automatically load the most recent export. Please select a JSON file manually.</div>';
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+      }
+    }
+    loadMostRecentExport()
+  </script>
+</body>
+</html>
