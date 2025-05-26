@@ -79,11 +79,11 @@ def init_graph_agent(toolNode: Tool) -> CompiledStateGraph:
                    and potential relationships between elements in the data.
                    The goal is to help readers understand the big picture, detect trends, anomalies,
                    or actionable insights, and suggest appropriate visual charts to effectively present the information.
-                    Please analyze the data in a list format. Each element in the list should include:
+                    Please analyze the data in a list format (data_analysis). Each element in the list should include:
                     - "description": Description of the analysis
                     - "value": Value or result derived from the data
                     - "visual": Appropriate illustration (chart, comparison, or image)
-                    
+                    - "conclusion": Analysis and conclusion
                     The entire response should be formatted as a valid JSON.
                    {context}
 
