@@ -63,15 +63,15 @@ def process_file(file_obj):
     # For demonstration, we'll just return the file name
 
     # Example of using the load_into_pandas function
-    # df = load_into_pandas(file_obj.name)
-    # vectorstore = save_into_vector_store(df, file_name)
-    # retriever = vectorstore.as_retriever()
-    # retriever_tool = create_retriever_tool(retriever,
-    #                                        f"search_internal_documents_of_data",
-    #                                        f"Search internal documents of data")
-    # map_file_name[file_name] = retriever_tool
-    # global graph_agent
-    # graph_agent = init_graph_agent(retriever_tool)
+    df = load_into_pandas(file_obj.name)
+    vectorstore = save_into_vector_store(df, file_name)
+    retriever = vectorstore.as_retriever()
+    retriever_tool = create_retriever_tool(retriever,
+                                           f"search_internal_documents_of_data",
+                                           f"Search internal documents of data")
+    map_file_name[file_name] = retriever_tool
+    global graph_agent
+    graph_agent = init_graph_agent(retriever_tool)
     # Make the text input visible and hide the file input
     return f"## File Uploaded\n\nFile '**{file_name}**' uploaded successfully. Please enter your text:", gr.update(visible=True), gr.update(visible=False)
 
@@ -85,19 +85,19 @@ def process_text(text):
 
     # Here you would typically process the text
     # For demonstration, we'll just return the text
-    # global graph_agent
-    # response = graph_agent.invoke({
-    #     "messages": [
-    #         {
-    #             "role": "user",
-    #             "content": f"{text}",
-    #         }
-    #     ]
-    # })
-    # text = response["messages"][-1].content
+    global graph_agent
+    response = graph_agent.invoke({
+        "messages": [
+            {
+                "role": "user",
+                "content": f"{text}",
+            }
+        ]
+    })
+    text = response["messages"][-1].content
 
     # Return text in Markdown format
-    return f"## Response\n\nYou entered: **{text}**"
+    return text
 
 def export_to_md(text):
     """
@@ -109,16 +109,23 @@ def export_to_md(text):
     Returns:
         tuple: A message indicating the result of the export and the file path for download
     """
+
     if not text:
         return "No content to export.", None
 
     # Create a timestamped filename
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"export_{timestamp}.md"
+    filename = f"export_{timestamp}.json"
 
     # Ensure the exports directory exists
     os.makedirs("exports", exist_ok=True)
     filepath = os.path.join("exports", filename)
+
+    # Remove ```json from the beginning and ``` from the end if present
+    if text.startswith("```json"):
+        text = text[7:]  # Remove ```json
+    if text.endswith("```"):
+        text = text[:-3]  # Remove ```
 
     # Write the content to the file
     with open(filepath, "w") as f:
@@ -168,7 +175,7 @@ with gr.Blocks() as demo:
 
             # Export button and download file
             with gr.Row():
-                export_button = gr.Button("Export to MD", visible=True)
+                export_button = gr.Button("Export JSON", visible=True)
                 download_file = gr.File(label="Download", visible=False)
 
     # Set up event handlers
