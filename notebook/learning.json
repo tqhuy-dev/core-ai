@@ -1,0 +1,187 @@
+{
+  "question_data": [
+    {
+      "question": "What is one of the benefits of visiting the beach?",
+      "type_question": "multi_choice",
+      "type_answer": "single_correct",
+      "answers_data": [
+        {
+          "content": "It helps relieve stress.",
+          "is_correct": true
+        },
+        {
+          "content": "It guarantees a cure for all ailments.",
+          "is_correct": false
+        },
+        {
+          "content": "It has no effect on mental health.",
+          "is_correct": false
+        },
+        {
+          "content": "It makes you more sedentary.",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "question": "Which activities can you do at the beach to become more active?",
+      "type_question": "multi_choice",
+      "type_answer": "multi_correct",
+      "answers_data": [
+        {
+          "content": "Swimming",
+          "is_correct": true
+        },
+        {
+          "content": "Sitting and doing nothing",
+          "is_correct": false
+        },
+        {
+          "content": "Taking a long walk",
+          "is_correct": true
+        },
+        {
+          "content": "Playing ball toss with friends",
+          "is_correct": true
+        }
+      ]
+    },
+    {
+      "question": "Spending time at the beach can help families feel more socially bonded.",
+      "type_question": "multi_choice",
+      "type_answer": "single_correct",
+      "answers_data": [
+        {
+          "content": "True",
+          "is_correct": true
+        },
+        {
+          "content": "False",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "question": "Visiting the beach has no impact on how you cope with pain.",
+      "type_question": "multi_choice",
+      "type_answer": "single_correct",
+      "answers_data": [
+        {
+          "content": "True",
+          "is_correct": false
+        },
+        {
+          "content": "False",
+          "is_correct": true
+        }
+      ]
+    },
+    {
+      "question": "What is a potential long-term effect of spending time at the beach?",
+      "type_question": "multi_choice",
+      "type_answer": "single_correct",
+      "answers_data": [
+        {
+          "content": "Improved social bonding",
+          "is_correct": true
+        },
+        {
+          "content": "Increased stress levels",
+          "is_correct": false
+        },
+        {
+          "content": "Decreased physical activity",
+          "is_correct": false
+        },
+        {
+          "content": "No change in lifestyle",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "question": "Which of the following statements is correct about beach visits?",
+      "type_question": "multi_choice",
+      "type_answer": "all_correct",
+      "answers_data": [
+        {
+          "content": "They can help relieve stress.",
+          "is_correct": true
+        },
+        {
+          "content": "They encourage physical activity.",
+          "is_correct": true
+        },
+        {
+          "content": "They can improve family relationships.",
+          "is_correct": true
+        },
+        {
+          "content": "They have no health benefits.",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "question": "What type of activities can help you cope with pain while at the beach?",
+      "type_question": "multi_choice",
+      "type_answer": "multi_correct",
+      "answers_data": [
+        {
+          "content": "Relaxing on the sand",
+          "is_correct": true
+        },
+        {
+          "content": "Engaging in sports",
+          "is_correct": true
+        },
+        {
+          "content": "Ignoring your pain",
+          "is_correct": false
+        },
+        {
+          "content": "Taking a swim",
+          "is_correct": true
+        }
+      ]
+    },
+    {
+      "question": "Is it true that spending time at the beach can have small, sustained effects over time?",
+      "type_question": "multi_choice",
+      "type_answer": "single_correct",
+      "answers_data": [
+        {
+          "content": "True",
+          "is_correct": true
+        },
+        {
+          "content": "False",
+          "is_correct": false
+        }
+      ]
+    },
+    {
+      "question": "Which of the following is NOT a benefit of going to the beach?",
+      "type_question": "multi_choice",
+      "type_answer": "none_correct",
+      "answers_data": [
+        {
+          "content": "It helps relieve stress.",
+          "is_correct": false
+        },
+        {
+          "content": "It encourages family bonding.",
+          "is_correct": false
+        },
+        {
+          "content": "It promotes physical activity.",
+          "is_correct": false
+        },
+        {
+          "content": "It has no positive effects.",
+          "is_correct": true
+        }
+      ]
+    }
+  ]
+}
