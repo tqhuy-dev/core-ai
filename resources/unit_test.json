@@ -1,0 +1,78 @@
+Dưới đây là bộ test case được viết dưới dạng JSON cho các yêu cầu đã được cung cấp trong tài liệu:
+
+```json
+[
+    {
+        "name": "TC001 - Validate employee retrieval for valid position",
+        "description": "Kiểm tra việc lấy danh sách nhân viên bị truy thu cho chức vụ 'Giao nhận' tại bưu cục 'PO001' trong khoảng thời gian hợp lệ.",
+        "priority": "P1"
+    },
+    {
+        "name": "TC002 - Validate employee retrieval for valid substitute position",
+        "description": "Kiểm tra việc lấy danh sách nhân viên cho chức vụ thay thế 'Tổ trưởng' khi không có nhân viên 'Giao nhận' tại bưu cục 'PO001'.",
+        "priority": "P1"
+    },
+    {
+        "name": "TC003 - Validate employee retrieval with no valid employees",
+        "description": "Kiểm tra trường hợp không có nhân viên nào thuộc chức vụ bị truy thu và không có nhân viên nào thuộc chức vụ thay thế tại bưu cục 'PO001'.",
+        "priority": "P1"
+    },
+    {
+        "name": "TC004 - Validate date filtering for employees",
+        "description": "Kiểm tra việc lọc nhân viên theo thời gian làm việc với điều kiện from_date ≤ end_day và (to_date ≥ start_day hoặc to_date = null).",
+        "priority": "P2"
+    },
+    {
+        "name": "TC005 - Validate start_day and end_day for stored_date",
+        "description": "Kiểm tra việc xác định start_day và end_day khi có stored_date tại bưu cục.",
+        "priority": "P2"
+    },
+    {
+        "name": "TC006 - Validate start_day and end_day when no stored_date",
+        "description": "Kiểm tra việc xác định start_day và end_day khi không có stored_date tại bưu cục.",
+        "priority": "P2"
+    },
+    {
+        "name": "TC007 - Validate employee with valid from_date and null to_date",
+        "description": "Kiểm tra trường hợp nhân viên có from_date hợp lệ và to_date là null.",
+        "priority": "P2"
+    },
+    {
+        "name": "TC008 - Validate employee with invalid from_date and to_date",
+        "description": "Kiểm tra trường hợp nhân viên có from_date lớn hơn to_date.",
+        "priority": "P3"
+    },
+    {
+        "name": "TC009 - Validate multiple post offices handling",
+        "description": "Kiểm tra việc xử lý nhiều bưu cục và xác định nhân viên bị truy thu cho từng bưu cục riêng biệt.",
+        "priority": "P1"
+    },
+    {
+        "name": "TC010 - Validate error ticket creation when no valid employees",
+        "description": "Kiểm tra việc tạo phiếu lỗi khi không có nhân viên nào hợp lệ cho chức vụ bị truy thu và chức vụ thay thế.",
+        "priority": "P1"
+    },
+    {
+        "name": "TC011 - Validate employee retrieval with overlapping dates",
+        "description": "Kiểm tra việc lấy danh sách nhân viên khi có nhiều nhân viên có thời gian làm việc chồng chéo.",
+        "priority": "P2"
+    },
+    {
+        "name": "TC012 - Validate retrieval of employees with different positions",
+        "description": "Kiểm tra việc lấy danh sách nhân viên với các chức vụ khác nhau tại cùng một bưu cục.",
+        "priority": "P2"
+    },
+    {
+        "name": "TC013 - Validate retrieval of employees with same from_date",
+        "description": "Kiểm tra việc lấy danh sách nhân viên có cùng from_date nhưng khác to_date.",
+        "priority": "P2"
+    },
+    {
+        "name": "TC014 - Validate retrieval of employees with future to_date",
+        "description": "Kiểm tra việc lấy danh sách nhân viên có to_date trong tương lai.",
+        "priority": "P3"
+    }
+]
+```
+
+Bộ test case này bao quát nhiều tình huống khác nhau liên quan đến việc xác định và lấy danh sách nhân viên bị truy thu, cũng như xử lý các điều kiện liên quan đến thời gian làm việc và chức vụ. Mỗi test case đều có mức độ ưu tiên riêng để giúp dễ dàng quản lý và thực hiện kiểm thử.
